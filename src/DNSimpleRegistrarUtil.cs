@@ -1,93 +1,121 @@
-﻿using System.Net.Http;
+﻿using Microsoft.Extensions.Configuration;
+using Soenneker.DNSimple.Registrar.Abstract;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Soenneker.DNSimple.Client.Abstract;
-using Soenneker.DNSimple.Registrar.Abstract;
-using Soenneker.DNSimple.Registrar.Requests;
-using Soenneker.DNSimple.Registrar.Responses;
+using Soenneker.DNSimple.OpenApiClient;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Check;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Premium_price;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Prices;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Registrations;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Registrations.Item;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Renewals;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Transfers;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Transfers.Item;
+using Soenneker.DNSimple.OpenApiClient.Models;
+using Soenneker.DNSimple.OpenApiClientUtil.Abstract;
 using Soenneker.Extensions.Configuration;
-using Soenneker.Extensions.HttpClient;
-using Soenneker.Extensions.ValueTask;
 
 namespace Soenneker.DNSimple.Registrar;
 
 /// <inheritdoc cref="IDNSimpleRegistrarUtil"/>
-public class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
+/// <summary>
+/// Implementation of the DNSimple registrar utility
+/// </summary>
+public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
 {
-    private readonly IDNSimpleClientUtil _clientUtil;
-    private readonly ILogger<DNSimpleRegistrarUtil> _logger;
+    private readonly IDNSimpleOpenApiClientUtil _clientUtil;
+    private readonly int _accountId;
 
-    private readonly string _accountId;
-
-    public DNSimpleRegistrarUtil(IDNSimpleClientUtil clientUtil, IConfiguration configuration, ILogger<DNSimpleRegistrarUtil> logger)
+    public DNSimpleRegistrarUtil(IDNSimpleOpenApiClientUtil clientUtil, IConfiguration configuration)
     {
         _clientUtil = clientUtil;
-        _logger = logger;
-        _accountId = configuration.GetValueStrict<string>("DNSimple:AccountId");
+
+        _accountId = configuration.GetValueStrict<int>("DNSimple:AccountId");
     }
 
-    public async ValueTask<DomainCheckResponse?> CheckDomainAvailability(string domain, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<DomainCheckResult?> CheckDomainAvailability(string domain, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/check";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<DomainCheckResponse>(HttpMethod.Get, endpoint, null, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        CheckGetResponse? response = await client[_accountId].Registrar.Domains[domain].Check.GetAsCheckGetResponseAsync(cancellationToken: cancellationToken);
+        return response?.Data;
     }
 
-    public async ValueTask<DomainPremiumPriceResponse?> GetDomainPremiumPrice(string domain, string action = "registration", bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<DomainPremiumPrice?> GetDomainPremiumPrice(string domain, string action = "registration",
+        CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/premium_price?action={action}";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<DomainPremiumPriceResponse>(HttpMethod.Get, endpoint, null, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        Premium_priceGetResponse? response = await client[_accountId]
+                                                   .Registrar.Domains[domain]
+                                                   .Premium_price.GetAsPremium_priceGetResponseAsync(
+                                                       config => config.QueryParameters =
+                                                           new Premium_priceRequestBuilder.Premium_priceRequestBuilderGetQueryParameters {Action = action},
+                                                       cancellationToken);
+        return response?.Data;
     }
 
-    public async ValueTask<DomainPricesResponse?> GetDomainPrices(string domain, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<DomainPrices?> GetDomainPrices(string domain, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/prices";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<DomainPricesResponse>(HttpMethod.Get, endpoint, null, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        PricesGetResponse? response =
+            await client[_accountId].Registrar.Domains[domain].Prices.GetAsPricesGetResponseAsync(cancellationToken: cancellationToken);
+        return response?.Data;
     }
 
-    public async ValueTask<DomainRegistrationResponse?> RegisterDomain(string domain, DomainRegistrationRequest request, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<DomainRegistration?> RegisterDomain(string domain, RegistrationsPostRequestBody request,
+        CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/registrations";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<DomainRegistrationResponse>(HttpMethod.Post, endpoint, request, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        RegistrationsPostResponse? response = await client[_accountId]
+                                                    .Registrar.Domains[domain]
+                                                    .Registrations.PostAsRegistrationsPostResponseAsync(request, cancellationToken: cancellationToken);
+        return response?.Data;
     }
 
-    public async ValueTask<DomainRegistrationResponse?> GetDomainRegistration(string domain, int registrationId, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<DomainRegistration?> GetDomainRegistration(string domain, int registrationId, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/registrations/{registrationId}";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<DomainRegistrationResponse>(HttpMethod.Get, endpoint, null, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        WithDomainregistrationGetResponse? response = await client[_accountId]
+                                                            .Registrar.Domains[domain]
+                                                            .Registrations[registrationId]
+                                                            .GetAsWithDomainregistrationGetResponseAsync(cancellationToken: cancellationToken);
+        return response?.Data;
     }
 
-    public async ValueTask<DomainTransferResponse?> TransferDomain(string domain, DomainTransferRequest request, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<DomainTransfer?> TransferDomain(string domain, TransfersPostRequestBody request, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/transfers";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<DomainTransferResponse>(HttpMethod.Post, endpoint, request, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        TransfersPostResponse? response = await client[_accountId]
+                                                .Registrar.Domains[domain]
+                                                .Transfers.PostAsTransfersPostResponseAsync(request, cancellationToken: cancellationToken);
+        return response?.Data;
     }
 
-    public async ValueTask<DomainTransferResponse?> GetDomainTransfer(string domain, int transferId, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<DomainTransfer?> GetDomainTransfer(string domain, int transferId, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/transfers/{transferId}";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<DomainTransferResponse>(HttpMethod.Get, endpoint, null, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        WithDomaintransferGetResponse? response = await client[_accountId]
+                                                        .Registrar.Domains[domain]
+                                                        .Transfers[transferId]
+                                                        .GetAsWithDomaintransferGetResponseAsync(cancellationToken: cancellationToken);
+        return response?.Data;
     }
 
-    public async ValueTask<bool> CancelDomainTransfer(string domain, int transferId, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<bool> CancelDomainTransfer(string domain, int transferId, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/transfers/{transferId}";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return (await client.SendToType<DomainTransferResponse>(HttpMethod.Delete, endpoint, null, _logger, cancellationToken)) != null;
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        await client[_accountId]
+              .Registrar.Domains[domain]
+              .Transfers[transferId]
+              .DeleteAsWithDomaintransferDeleteResponseAsync(cancellationToken: cancellationToken);
+        return true;
     }
 
-    public async ValueTask<DomainRenewalResponse?> RenewDomain(string domain, DomainRenewalRequest request, bool test = false, CancellationToken cancellationToken = default)
+    public async ValueTask<DomainRenewal?> RenewDomain(string domain, RenewalsPostRequestBody request, CancellationToken cancellationToken = default)
     {
-        var endpoint = $"{_accountId}/registrar/domains/{domain}/renewals";
-        HttpClient client = await _clientUtil.Get(test, cancellationToken).NoSync();
-        return await client.SendToType<DomainRenewalResponse>(HttpMethod.Post, endpoint, request, _logger, cancellationToken);
+        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken);
+        RenewalsPostResponse? response = await client[_accountId]
+                                               .Registrar.Domains[domain]
+                                               .Renewals.PostAsRenewalsPostResponseAsync(request, cancellationToken: cancellationToken);
+        return response?.Data;
     }
 }

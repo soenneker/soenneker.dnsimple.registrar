@@ -1,61 +1,59 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Soenneker.DNSimple.Registrar.Requests;
-using Soenneker.DNSimple.Registrar.Responses;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Registrations;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Renewals;
+using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Transfers;
+using Soenneker.DNSimple.OpenApiClient.Models;
 
 namespace Soenneker.DNSimple.Registrar.Abstract;
 
 /// <summary>
-/// A .NET typesafe implementation of DNSimple's Registrar API
+/// Utility class for managing DNSimple registrar operations
 /// </summary>
 public interface IDNSimpleRegistrarUtil
 {
     /// <summary>
-    /// Checks if a domain is available for registration.
+    /// Checks domain availability
     /// </summary>
-    /// <param name="domain">The domain name to check.</param>
-    /// <param name="test">Indicates whether to use a test environment.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>The domain availability information.</returns>
-    ValueTask<DomainCheckResponse?> CheckDomainAvailability(string domain, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<DomainCheckResult?> CheckDomainAvailability(string domain, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the premium price for a domain.
+    /// Gets domain premium price
     /// </summary>
-    ValueTask<DomainPremiumPriceResponse?> GetDomainPremiumPrice(string domain, string action = "registration", bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<DomainPremiumPrice?> GetDomainPremiumPrice(string domain, string action = "registration", CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves domain prices.
+    /// Gets domain prices
     /// </summary>
-    ValueTask<DomainPricesResponse?> GetDomainPrices(string domain, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<DomainPrices?> GetDomainPrices(string domain, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Registers a domain.
+    /// Registers a domain
     /// </summary>
-    ValueTask<DomainRegistrationResponse?> RegisterDomain(string domain, DomainRegistrationRequest request, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<DomainRegistration?> RegisterDomain(string domain, RegistrationsPostRequestBody request, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves details of a domain registration.
+    /// Gets domain registration details
     /// </summary>
-    ValueTask<DomainRegistrationResponse?> GetDomainRegistration(string domain, int registrationId, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<DomainRegistration?> GetDomainRegistration(string domain, int registrationId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Transfers a domain.
+    /// Transfers a domain
     /// </summary>
-    ValueTask<DomainTransferResponse?> TransferDomain(string domain, DomainTransferRequest request, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<DomainTransfer?> TransferDomain(string domain, TransfersPostRequestBody request, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves details of a domain transfer.
+    /// Gets domain transfer details
     /// </summary>
-    ValueTask<DomainTransferResponse?> GetDomainTransfer(string domain, int transferId, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<DomainTransfer?> GetDomainTransfer(string domain, int transferId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Cancels a domain transfer.
+    /// Cancels a domain transfer
     /// </summary>
-    ValueTask<bool> CancelDomainTransfer(string domain, int transferId, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<bool> CancelDomainTransfer(string domain, int transferId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Renews a domain.
+    /// Renews a domain
     /// </summary>
-    ValueTask<DomainRenewalResponse?> RenewDomain(string domain, DomainRenewalRequest request, bool test = false, CancellationToken cancellationToken = default);
+    ValueTask<DomainRenewal?> RenewDomain(string domain, RenewalsPostRequestBody request, CancellationToken cancellationToken = default);
 }
