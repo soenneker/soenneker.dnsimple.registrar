@@ -30,6 +30,11 @@ public interface IDNSimpleRegistrarUtil
     /// <summary>
     /// Registers a domain
     /// </summary>
+    ValueTask RegisterDomain(string domain, int registrantId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers a domain
+    /// </summary>
     ValueTask<DomainRegistration?> RegisterDomain(string domain, RegistrationsPostRequestBody request, CancellationToken cancellationToken = default);
 
     /// <summary>
