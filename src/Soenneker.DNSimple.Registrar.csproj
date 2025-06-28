@@ -42,6 +42,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.DNSimple.OpenApiClientUtil" Version="3.0.52" />
+        <PackageReference Include="Soenneker.DNSimple.OpenApiClientUtil" Version="3.0.53" />
     </ItemGroup>
 </Project>
