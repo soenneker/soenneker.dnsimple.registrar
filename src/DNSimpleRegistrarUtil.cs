@@ -36,8 +36,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
     public async ValueTask<DomainCheckResult?> CheckDomainAvailability(string domain, CancellationToken cancellationToken = default)
     {
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
-        CheckGetResponse? response =
-            await client[_accountId].Registrar.Domains[domain].Check.GetAsCheckGetResponseAsync(cancellationToken: cancellationToken).NoSync();
+        CheckGetResponse? response = await client[_accountId].Registrar.Domains[domain].Check.GetAsync(cancellationToken: cancellationToken).NoSync();
         return response?.Data;
     }
 
@@ -45,8 +44,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
         CancellationToken cancellationToken = default)
     {
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
-        PricesGetResponse? response =
-            await client[_accountId].Registrar.Domains[domain].Prices.GetAsPricesGetResponseAsync(cancellationToken: cancellationToken).NoSync();
+        PricesGetResponse? response = await client[_accountId].Registrar.Domains[domain].Prices.GetAsync(cancellationToken: cancellationToken).NoSync();
 
         if (response?.Data == null)
             return null;
@@ -67,8 +65,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
     public async ValueTask<DomainPrices?> GetDomainPrices(string domain, CancellationToken cancellationToken = default)
     {
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
-        PricesGetResponse? response =
-            await client[_accountId].Registrar.Domains[domain].Prices.GetAsPricesGetResponseAsync(cancellationToken: cancellationToken).NoSync();
+        PricesGetResponse? response = await client[_accountId].Registrar.Domains[domain].Prices.GetAsync(cancellationToken: cancellationToken).NoSync();
 
         return response?.Data;
     }
@@ -91,7 +88,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
         RegistrationsPostResponse? response = await client[_accountId]
                                                     .Registrar.Domains[domain]
-                                                    .Registrations.PostAsRegistrationsPostResponseAsync(request, cancellationToken: cancellationToken)
+                                                    .Registrations.PostAsync(request, cancellationToken: cancellationToken)
                                                     .NoSync();
         return response?.Data;
     }
@@ -102,7 +99,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
         WithDomainregistrationGetResponse? response = await client[_accountId]
                                                             .Registrar.Domains[domain]
                                                             .Registrations[registrationId]
-                                                            .GetAsWithDomainregistrationGetResponseAsync(cancellationToken: cancellationToken)
+                                                            .GetAsync(cancellationToken: cancellationToken)
                                                             .NoSync();
         return response?.Data;
     }
@@ -112,7 +109,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
         TransfersPostResponse? response = await client[_accountId]
                                                 .Registrar.Domains[domain]
-                                                .Transfers.PostAsTransfersPostResponseAsync(request, cancellationToken: cancellationToken)
+                                                .Transfers.PostAsync(request, cancellationToken: cancellationToken)
                                                 .NoSync();
         return response?.Data;
     }
@@ -123,7 +120,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
         WithDomaintransferGetResponse? response = await client[_accountId]
                                                         .Registrar.Domains[domain]
                                                         .Transfers[transferId]
-                                                        .GetAsWithDomaintransferGetResponseAsync(cancellationToken: cancellationToken)
+                                                        .GetAsync(cancellationToken: cancellationToken)
                                                         .NoSync();
         return response?.Data;
     }
@@ -131,11 +128,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
     public async ValueTask<bool> CancelDomainTransfer(string domain, int transferId, CancellationToken cancellationToken = default)
     {
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
-        await client[_accountId]
-              .Registrar.Domains[domain]
-              .Transfers[transferId]
-              .DeleteAsWithDomaintransferDeleteResponseAsync(cancellationToken: cancellationToken)
-              .NoSync();
+        await client[_accountId].Registrar.Domains[domain].Transfers[transferId].DeleteAsync(cancellationToken: cancellationToken).NoSync();
         return true;
     }
 
@@ -144,7 +137,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
         RenewalsPostResponse? response = await client[_accountId]
                                                .Registrar.Domains[domain]
-                                               .Renewals.PostAsRenewalsPostResponseAsync(request, cancellationToken: cancellationToken)
+                                               .Renewals.PostAsync(request, cancellationToken: cancellationToken)
                                                .NoSync();
         return response?.Data;
     }
