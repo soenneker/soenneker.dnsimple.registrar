@@ -40,28 +40,6 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
         return response?.Data;
     }
 
-    public async ValueTask<DomainPremiumPrice?> GetDomainPremiumPrice(string domain, string action = "registration",
-        CancellationToken cancellationToken = default)
-    {
-        DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
-        PricesGetResponse? response = await client[_accountId].Registrar.Domains[domain].Prices.GetAsync(cancellationToken: cancellationToken).NoSync();
-
-        if (response?.Data == null)
-            return null;
-
-        return new DomainPremiumPrice
-        {
-            Action = action,
-            PremiumPrice = action.ToLower() switch
-            {
-                "registration" => response.Data.RegistrationPrice?.ToString(),
-                "renewal" => response.Data.RenewalPrice?.ToString(),
-                "transfer" => response.Data.TransferPrice?.ToString(),
-                _ => response.Data.RegistrationPrice?.ToString()
-            }
-        };
-    }
-
     public async ValueTask<DomainPrices?> GetDomainPrices(string domain, CancellationToken cancellationToken = default)
     {
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();

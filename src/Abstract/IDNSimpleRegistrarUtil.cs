@@ -18,11 +18,6 @@ public interface IDNSimpleRegistrarUtil
     ValueTask<DomainCheckResult?> CheckDomainAvailability(string domain, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Gets domain premium price
-    /// </summary>
-    ValueTask<DomainPremiumPrice?> GetDomainPremiumPrice(string domain, string action = "registration", CancellationToken cancellationToken = default);
-
-    /// <summary>
     /// Gets domain prices
     /// </summary>
     ValueTask<DomainPrices?> GetDomainPrices(string domain, CancellationToken cancellationToken = default);
