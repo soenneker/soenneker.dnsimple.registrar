@@ -1,8 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Registrations;
-using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Renewals;
-using Soenneker.DNSimple.OpenApiClient.Item.Registrar.Domains.Item.Transfers;
 using Soenneker.DNSimple.OpenApiClient.Models;
 
 namespace Soenneker.DNSimple.Registrar.Abstract;
@@ -30,7 +27,7 @@ public interface IDNSimpleRegistrarUtil
     /// <summary>
     /// Registers a domain
     /// </summary>
-    ValueTask<DomainRegistration?> RegisterDomain(string domain, RegistrationsPostRequestBody request, CancellationToken cancellationToken = default);
+    ValueTask<DomainRegistration?> RegisterDomain(string domain, DomainRegisterRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets domain registration details
@@ -40,7 +37,7 @@ public interface IDNSimpleRegistrarUtil
     /// <summary>
     /// Transfers a domain
     /// </summary>
-    ValueTask<DomainTransfer?> TransferDomain(string domain, TransfersPostRequestBody request, CancellationToken cancellationToken = default);
+    ValueTask<DomainTransfer?> TransferDomain(string domain, DomainTransferRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets domain transfer details
@@ -55,5 +52,5 @@ public interface IDNSimpleRegistrarUtil
     /// <summary>
     /// Renews a domain
     /// </summary>
-    ValueTask<DomainRenewal?> RenewDomain(string domain, RenewalsPostRequestBody request, CancellationToken cancellationToken = default);
+    ValueTask<DomainRenewal?> RenewDomain(string domain, DomainRenewRequest request, CancellationToken cancellationToken = default);
 }
