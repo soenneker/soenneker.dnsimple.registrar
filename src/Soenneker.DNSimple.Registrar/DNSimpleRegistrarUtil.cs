@@ -18,10 +18,6 @@ using System.Threading.Tasks;
 
 namespace Soenneker.DNSimple.Registrar;
 
-/// <inheritdoc cref="IDNSimpleRegistrarUtil"/>
-/// <summary>
-/// Implementation of the DNSimple registrar utility
-/// </summary>
 public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
 {
     private readonly IDNSimpleOpenApiClientUtil _clientUtil;
