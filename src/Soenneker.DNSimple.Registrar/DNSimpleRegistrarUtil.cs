@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 namespace Soenneker.DNSimple.Registrar;
 
+/// <inheritdoc cref="IDNSimpleRegistrarUtil" />
 public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
 {
     private readonly IDNSimpleOpenApiClientUtil _clientUtil;
