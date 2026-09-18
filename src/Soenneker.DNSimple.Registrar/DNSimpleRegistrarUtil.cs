@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 
 namespace Soenneker.DNSimple.Registrar;
 
-/// <inheritdoc cref="IDNSimpleRegistrarUtil" />
 public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
 {
     private readonly IDNSimpleOpenApiClientUtil _clientUtil;
@@ -110,7 +109,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
     public async ValueTask<DomainRenewal?> RenewDomain(string domain, DomainRenewRequest request, CancellationToken cancellationToken = default)
     {
         DNSimpleOpenApiClient client = await _clientUtil.Get(cancellationToken).NoSync();
-        DomainRenew201Response? response = await client[_accountId]
+        RenewDomain201Response? response = await client[_accountId]
                                                .Registrar.Domains[domain]
                                                .Renewals.PostAsync(request, cancellationToken: cancellationToken)
                                                .NoSync();
