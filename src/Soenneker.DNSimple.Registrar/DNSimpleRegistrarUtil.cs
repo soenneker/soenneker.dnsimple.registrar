@@ -26,7 +26,7 @@ public sealed class DNSimpleRegistrarUtil : IDNSimpleRegistrarUtil
     public DNSimpleRegistrarUtil(IDNSimpleOpenApiClientUtil clientUtil, IConfiguration configuration)
     {
         _clientUtil = clientUtil;
-        _accountId = configuration.GetValueStrict<int>("DNSimple:AccountId");
+        _accountId = (int)new System.ComponentModel.Int32Converter().ConvertFromInvariantString(configuration.GetStringStrict("DNSimple:AccountId"))!;
     }
 
     public async ValueTask<DomainCheckResult?> CheckDomainAvailability(string domain, CancellationToken cancellationToken = default)
